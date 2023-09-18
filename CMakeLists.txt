@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-set(BOARD esp32)
-
-find_package(Zephyr)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(vortice_v2)
 
-target_sources(app PRIVATE src/main.c)
+file(GLOB APP_SOURCES CONFIGURE_DEPENDS 
+    "**/*.cc"
+    "**/*.c")
+
+target_sources(app PRIVATE ${APP_SOURCES})
