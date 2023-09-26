@@ -5,7 +5,6 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(vortice_v2)
 
 file(GLOB APP_SOURCES CONFIGURE_DEPENDS 
-    "**/*.cc"
     "**/*.c")
 
 target_sources(app PRIVATE ${APP_SOURCES})
