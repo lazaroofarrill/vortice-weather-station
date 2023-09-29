@@ -1,0 +1,10 @@
+/ {
+    aliases {
+        board-i2c = &i2c1;
+    };
+};
+
+&usart1 {
+     status = "okay";
+    current-speed = < 115200 >;
+};
