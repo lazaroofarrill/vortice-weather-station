@@ -1,3 +1,4 @@
+#include "ds1307.h"
 #include "errno.h"
 #include "zephyr/device.h"
 #include "zephyr/drivers/gpio.h"
@@ -18,23 +19,20 @@ int i2c_ping(const struct device *i2c_dev, uint16_t addr) {
 }
 
 void scan_i2c(const struct device *i2c_dev, const struct gpio_dt_spec led) {
-  while (true) {
-    for (uint8_t i = 3; i < 0x78; i++) {
-      int result = i2c_ping(i2c_dev, i);
+  for (uint8_t i = 3; i < 0x78; i++) {
+    int result = i2c_ping(i2c_dev, i);
 
-      if (i % 16 == 0)
-        printk("\n%.2x:", i);
+    if (i % 16 == 0)
+      printk("\n%.2x:", i);
 
-      if (result == 0) {
-        printk(" %.2x", i);
-        return;
-      } else
-        printk(" --");
-    }
-
-    k_msleep(1000);
-    gpio_pin_toggle_dt(&led);
+    if (result == 0) {
+      printk(" %.2x", i);
+    } else
+      printk(" --");
   }
+
+  k_msleep(1000);
+  gpio_pin_toggle_dt(&led);
 }
 
 // A build error here means the board is not supported
@@ -63,6 +61,8 @@ int main() {
   printk("Scanning i2c:\n");
   scan_i2c(i2c_dev, led);
   printk("\n");
+
+  struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
 
   while (1) {
     struct sensor_value angle;
