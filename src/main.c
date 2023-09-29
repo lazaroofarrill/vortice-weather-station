@@ -2,6 +2,7 @@
 #include "zephyr/device.h"
 #include "zephyr/drivers/gpio.h"
 #include "zephyr/drivers/i2c.h"
+#include "zephyr/drivers/sensor.h"
 #include "zephyr/kernel.h"
 #include "zephyr/logging/log.h"
 #include "zephyr/sys/printk.h"
@@ -16,6 +17,26 @@ int i2c_ping(const struct device *i2c_dev, uint16_t addr) {
   return i2c_write(i2c_dev, msg, 1, addr);
 }
 
+void scan_i2c(const struct device *i2c_dev, const struct gpio_dt_spec led) {
+  while (true) {
+    for (uint8_t i = 3; i < 0x78; i++) {
+      int result = i2c_ping(i2c_dev, i);
+
+      if (i % 16 == 0)
+        printk("\n%.2x:", i);
+
+      if (result == 0) {
+        printk(" %.2x", i);
+        return;
+      } else
+        printk(" --");
+    }
+
+    k_msleep(1000);
+    gpio_pin_toggle_dt(&led);
+  }
+}
+
 // A build error here means the board is not supported
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
@@ -28,15 +49,9 @@ int main() {
     return 0;
   }
 
-  //  while (1) {
-  //    ret = gpio_pin_toggle_dt(&led);
-  //    if (ret < 0) {
-  //      return 0;
-  //    }
-  //    k_msleep(SLEEP_TIME_MS);
-  //  }
-
   const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(board_i2c));
+  const struct device *const as5600_dev = DEVICE_DT_GET_ONE(ams_as5600);
+
   printk("\n");
 
   if (!device_is_ready(i2c_dev)) {
@@ -46,22 +61,18 @@ int main() {
 
   printk("Using board %s\n", CONFIG_BOARD);
   printk("Scanning i2c:\n");
+  scan_i2c(i2c_dev, led);
+  printk("\n");
 
-  while (true) {
-    for (uint8_t i = 3; i < 0x78; i++) {
-      int result = i2c_ping(i2c_dev, i);
+  while (1) {
+    struct sensor_value angle;
 
-      if (i % 16 == 0)
-        printk("\n%.2x:", i);
+    sensor_sample_fetch(as5600_dev);
+    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
+    printk("angle: %d.%06d\n", angle.val1, angle.val2);
 
-      if (result == 0) {
-        printk(" %.2x", i);
-      } else
-        printk(" --");
-    }
-
-    k_msleep(1000);
-    gpio_pin_toggle_dt(&led);
+    k_sleep(K_MSEC(1000));
   }
+
   return 0;
 }

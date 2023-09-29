@@ -8,3 +8,12 @@
      status = "okay";
     current-speed = < 115200 >;
 };
+
+&i2c1 {
+   as5600@36 {
+        compatible = "ams,as5600";
+        friendly-name = "veleta";
+        reg = <0x36>;
+        status = "okay";
+   }; 
+};
