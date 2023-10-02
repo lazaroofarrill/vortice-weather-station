@@ -75,10 +75,10 @@ int ds1307_time_set(const struct RtcDs1307 *rtc, struct tm *time) {
   write_buff[1] = write_buff[1] | bin2bcd(time->tm_sec);
   write_buff[2] = write_buff[2] | bin2bcd(time->tm_min);
   write_buff[3] = write_buff[3] | bin2bcd(time->tm_hour);
-  write_buff[4] = write_buff[4] | bin2bcd(time->tm_wday);
+  write_buff[4] = write_buff[4] | bin2bcd(time->tm_wday + 1);
   write_buff[5] = write_buff[5] | bin2bcd(time->tm_mday);
   write_buff[6] = write_buff[6] | bin2bcd(time->tm_mon + 1);
-  write_buff[7] = write_buff[7] | bin2bcd(time->tm_year);
+  write_buff[7] = write_buff[7] | bin2bcd(time->tm_year - 100);
 
   err = i2c_write(rtc->dev, write_buff, sizeof(write_buff), rtc->addr);
   if (err != 0) {
@@ -116,7 +116,7 @@ int ds1307_time_fetch(const struct RtcDs1307 *rtc) {
                     .tm_mon = month - 1, // months in DS1307 go from 1-12
                     .tm_hour = hours,
                     .tm_mday = date,
-                    .tm_wday = day,
+                    .tm_wday = day - 1,
                     .tm_year = (int)year + 100}; // RTC returns years from 2000
 
   time_t unix_time = timeutil_timegm(&time);
