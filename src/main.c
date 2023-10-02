@@ -6,11 +6,14 @@
 #include "zephyr/drivers/sensor.h"
 #include "zephyr/kernel.h"
 #include "zephyr/logging/log.h"
+#include "zephyr/logging/log_core.h"
 #include "zephyr/sys/printk.h"
 #include <stdint.h>
 
 #define LED0_NODE DT_ALIAS(led0)
 #define SLEEP_TIME_MS 1000
+
+LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 
 int i2c_ping(const struct device *i2c_dev, uint16_t addr) {
   const uint8_t msg[1] = {0};
@@ -38,8 +41,6 @@ void scan_i2c(const struct device *i2c_dev, const struct gpio_dt_spec led) {
 // A build error here means the board is not supported
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
-LOG_MODULE_REGISTER(imu_logger, LOG_LEVEL_INF);
-
 int main() {
   printk("hello world");
   int ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
@@ -48,7 +49,7 @@ int main() {
   }
 
   const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(board_i2c));
-  const struct device *const as5600_dev = DEVICE_DT_GET_ONE(ams_as5600);
+  const struct device *const as5600_dev = DEVICE_DT_GET(DT_ALIAS(vane));
 
   printk("\n");
 
@@ -67,10 +68,11 @@ int main() {
   while (1) {
     struct sensor_value angle;
 
-    sensor_sample_fetch(as5600_dev);
-    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
-    printk("angle: %d.%06d\n", angle.val1, angle.val2);
-    // ds1307_time_fetch(rtc);
+    //    sensor_sample_fetch(as5600_dev);
+    //    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
+    //    printk("angle: %d.%06d\n", angle.val1, angle.val2);
+    ds1307_time_fetch(rtc);
+    printk("\n");
 
     k_sleep(K_MSEC(1000));
   }

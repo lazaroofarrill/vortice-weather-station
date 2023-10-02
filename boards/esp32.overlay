@@ -2,6 +2,7 @@
     aliases {
         board-i2c = &i2c0;
         led0 = &led0;
+        vane = &as5600@36;
     };
 
     leds {
@@ -21,7 +22,7 @@
 &i2c0 {
    as5600@36 {
         compatible = "ams,as5600";
-        friendly-name = "veleta";
+        friendly-name = "vane";
         reg = <0x36>;
         status = "okay";
    }; 
