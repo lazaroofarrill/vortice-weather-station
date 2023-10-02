@@ -1,3 +1,29 @@
-&wifi {
-	status = "okay";
+/ {
+    aliases {
+        board-i2c = &i2c0;
+        led0 = &led0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        led0: led_0 {
+                gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+                label = "LED 0";
+        };
+    };
 };
+
+&uart1 {
+     status = "okay";
+    current-speed = < 115200 >;
+};
+
+&i2c0 {
+   as5600@36 {
+        compatible = "ams,as5600";
+        friendly-name = "veleta";
+        reg = <0x36>;
+        status = "okay";
+   }; 
+};
+

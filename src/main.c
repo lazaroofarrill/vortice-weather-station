@@ -70,6 +70,7 @@ int main() {
     sensor_sample_fetch(as5600_dev);
     sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
     printk("angle: %d.%06d\n", angle.val1, angle.val2);
+    // ds1307_time_fetch(rtc);
 
     k_sleep(K_MSEC(1000));
   }
