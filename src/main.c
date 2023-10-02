@@ -42,7 +42,6 @@ void scan_i2c(const struct device *i2c_dev, const struct gpio_dt_spec led) {
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
 int main() {
-  printk("hello world");
   int ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
   if (ret < 0) {
     return 0;
@@ -66,15 +65,15 @@ int main() {
   struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
 
   while (1) {
-    struct sensor_value angle;
+    // struct sensor_value angle;
 
     //    sensor_sample_fetch(as5600_dev);
     //    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
     //    printk("angle: %d.%06d\n", angle.val1, angle.val2);
     ds1307_time_fetch(rtc);
-    printk("\n");
 
     k_sleep(K_MSEC(1000));
+    gpio_pin_toggle_dt(&led);
   }
 
   return 0;
