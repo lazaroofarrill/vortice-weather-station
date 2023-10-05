@@ -2,6 +2,7 @@
     aliases {
         board-i2c = &i2c1;
         vane = &vane;
+        compass = &compass;
     };
 };
 
@@ -16,5 +17,12 @@
         friendly-name = "vane";
         reg = <0x36>;
         status = "okay";
-   }; 
+   };
+
+   compass: icm20948@69 {
+        compatible = "invensense,icm20948";
+        friendly-name = "compass";
+        reg = <0x69>;
+        status = "okay";
+   };
 };

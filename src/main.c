@@ -13,7 +13,7 @@
 #define LED0_NODE DT_ALIAS(led0)
 #define SLEEP_TIME_MS 1000
 
-LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(app);
 
 int i2c_ping(const struct device *i2c_dev, uint16_t addr) {
   const uint8_t msg[1] = {0};
@@ -49,6 +49,8 @@ int main() {
 
   const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(board_i2c));
   const struct device *const as5600_dev = DEVICE_DT_GET(DT_ALIAS(vane));
+  const struct device *const icm20948_dev =
+      DEVICE_DT_GET_ANY(invensense_icm20948);
 
   printk("\n");
 
@@ -62,15 +64,21 @@ int main() {
   scan_i2c(i2c_dev, led);
   printk("\n");
 
-  struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
+  //  struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
 
   while (1) {
-    // struct sensor_value angle;
+    struct sensor_value angle;
+    struct sensor_value accel_x;
 
     //    sensor_sample_fetch(as5600_dev);
     //    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
+
+    sensor_sample_fetch(icm20948_dev);
+    sensor_channel_get(icm20948_dev, SENSOR_CHAN_ACCEL_X, &accel_x);
     //    printk("angle: %d.%06d\n", angle.val1, angle.val2);
-    ds1307_time_fetch(rtc);
+    // ds1307_time_fetch(rtc);
+    //
+    printk("x: %d.%d", accel_x.val1, accel_x.val2);
 
     k_sleep(K_MSEC(1000));
     gpio_pin_toggle_dt(&led);
