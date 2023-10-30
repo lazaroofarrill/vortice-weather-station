@@ -1,6 +1,6 @@
 / {
     aliases {
-        board-i2c = &i2c1;
+        i2c0 = &i2c1;
         vane = &vane;
         compass = &compass;
     };

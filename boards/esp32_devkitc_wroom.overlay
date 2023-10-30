@@ -1,8 +1,8 @@
 / {
     aliases {
-        board-i2c = &i2c0;
+        i2c0 = &i2c0;
         led0 = &led0;
-        vane = &as5600@36;
+        vane = &vane;
     };
 
     leds {
@@ -20,11 +20,18 @@
 };
 
 &i2c0 {
-   as5600@36 {
+   vane: as5600@36 {
         compatible = "ams,as5600";
         friendly-name = "vane";
         reg = <0x36>;
         status = "okay";
    }; 
+   
+   compass: icm20948@69 {
+        compatible = "invensense,icm20948";
+        friendly-name = "compass";
+        reg = <0x69>;
+        status = "okay";
+   };
 };
 

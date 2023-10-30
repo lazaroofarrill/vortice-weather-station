@@ -47,15 +47,19 @@ int main() {
     return 0;
   }
 
-  const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(board_i2c));
+  const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(i2c0));
   const struct device *const as5600_dev = DEVICE_DT_GET(DT_ALIAS(vane));
-  const struct device *const icm20948_dev =
-      DEVICE_DT_GET_ANY(invensense_icm20948);
+  const struct device *const icm20948_dev = DEVICE_DT_GET(DT_ALIAS(compass));
 
   printk("\n");
 
   if (!device_is_ready(i2c_dev)) {
     printk("Could not get i2c device\n");
+    return -1;
+  }
+
+  if (!device_is_ready(icm20948_dev)) {
+    printk("Could not get icm20948 sensor");
     return -1;
   }
 
