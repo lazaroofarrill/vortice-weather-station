@@ -48,7 +48,7 @@ int main() {
     }
 
     const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(i2c0));
-    const struct device *const as5600_dev = DEVICE_DT_GET(DT_ALIAS(vane));
+//    const struct device *const as5600_dev = DEVICE_DT_GET(DT_ALIAS(vane));
     const struct device *const icm20948_dev = DEVICE_DT_GET(DT_ALIAS(compass));
 
     printk("\n");
@@ -72,17 +72,12 @@ int main() {
 
     char axis[] = {'x', 'y', 'z'};
 
-    while (1) {
-        struct sensor_value angle;
-        struct sensor_value accel_xyz[3];
 
-        //    sensor_sample_fetch(as5600_dev);
-        //    sensor_channel_get(as5600_dev, SENSOR_CHAN_ROTATION, &angle);
+    while (1) {
+        struct sensor_value accel_xyz[3];
 
         sensor_sample_fetch(icm20948_dev);
         sensor_channel_get(icm20948_dev, SENSOR_CHAN_ACCEL_XYZ, accel_xyz);
-        //    printk("angle: %d.%06d\n", angle.val1, angle.val2);
-        // ds1307_time_fetch(rtc);
 
         for (int i = 0; i < 3; i++) {
             printk("%c: %d.%d\t", axis[i], (accel_xyz + i)->val1, (accel_xyz + i)->val2);
