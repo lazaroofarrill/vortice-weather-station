@@ -12,6 +12,8 @@
 };
 
 &i2c1 {
+   clock-frequency = <400000>;
+
    vane: as5600@36 {
         compatible = "ams,as5600";
         friendly-name = "vane";
@@ -19,10 +21,11 @@
         status = "okay";
    };
 
-   compass: icm20948@69 {
+   compass: icm20948@68 {
         compatible = "invensense,icm20948";
         friendly-name = "compass";
-        reg = <0x69>;
+        reg = <0x68>;
         status = "okay";
+        accel-fs = <16>;
    };
 };

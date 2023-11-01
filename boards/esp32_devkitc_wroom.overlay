@@ -3,6 +3,7 @@
         i2c0 = &i2c0;
         led0 = &led0;
         vane = &vane;
+        compass = &compass;
     };
 
     leds {
@@ -32,6 +33,7 @@
         friendly-name = "compass";
         reg = <0x69>;
         status = "okay";
+        accel-fs = <2>;
    };
 };
 
