@@ -27,5 +27,7 @@
         reg = <0x68>;
         status = "okay";
         accel-fs = <16>;
+        gyro-fs = <2000>;
+        mag-freq = <100>;
    };
 };

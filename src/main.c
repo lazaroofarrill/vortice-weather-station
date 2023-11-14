@@ -11,7 +11,6 @@
 #include <stdint.h>
 
 #define LED0_NODE DT_ALIAS(led0)
-#define SLEEP_TIME_MS 1000
 
 LOG_MODULE_REGISTER(app);
 
@@ -62,33 +61,49 @@ int main() {
   }
 
   printk("Using board %s\n", CONFIG_BOARD);
-  printk("Scanning i2c:\n");
-  scan_i2c(i2c_dev, led);
   printk("\n");
+
+  k_msleep(1000);
+  scan_i2c(i2c_dev, led);
 
   //  struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
 
   char axis[] = {'x', 'y', 'z'};
 
   while (1) {
-    struct sensor_value accel_xyz[3];
-    struct sensor_value temp;
-    float temp_deg = sensor_value_to_float(&temp);
-    float accel_xyz_f[3];
-    for (int i = 0; i < 3; i++) {
-      accel_xyz_f[i] = sensor_value_to_float(accel_xyz + i);
-    }
 
-    sensor_sample_fetch(icm20948_dev);
+    struct sensor_value accel_xyz[3];
+    struct sensor_value gyro_xyz[3];
+    struct sensor_value mag_xyz[3];
+    struct sensor_value temp;
+
+    int err = sensor_sample_fetch(icm20948_dev);
+    if (err) {
+      k_msleep(100);
+      continue;
+    }
     sensor_channel_get(icm20948_dev, SENSOR_CHAN_ACCEL_XYZ, accel_xyz);
+    sensor_channel_get(icm20948_dev, SENSOR_CHAN_GYRO_XYZ, gyro_xyz);
+    sensor_channel_get(icm20948_dev, SENSOR_CHAN_MAGN_XYZ, mag_xyz);
     sensor_channel_get(icm20948_dev, SENSOR_CHAN_DIE_TEMP, &temp);
 
-    printk("temp: %.2f\t", temp_deg);
-    printk("acc[ ");
+    printk("acc( ");
     for (int i = 0; i < 3; i++) {
-      printk("%c: %20.6f\t", axis[i], accel_xyz_f[i]);
+      printk("%c: %20.6f\t", axis[i], sensor_value_to_float(accel_xyz + i));
     }
-    printk(" ]");
+    printk(" )\n");
+
+    printk("gyro( ");
+    for (int i = 0; i < 3; i++) {
+      printk("%c: %20.6f\t", axis[i], sensor_value_to_float(gyro_xyz + i));
+    }
+    printk(" )\n");
+
+    printk("mag( ");
+    for (int i = 0; i < 3; i++) {
+      printk("%c: %20.6f\t", axis[i], sensor_value_to_float(mag_xyz + i));
+    }
+    printk(" )");
     printk("\n");
 
     k_sleep(K_MSEC(1000));
