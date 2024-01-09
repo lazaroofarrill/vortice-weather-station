@@ -1,3 +1,4 @@
+#include "compass.h"
 #include "ds1307.h"
 #include "errno.h"
 #include "zephyr/device.h"
@@ -9,6 +10,16 @@
 #include "zephyr/logging/log_core.h"
 #include "zephyr/sys/printk.h"
 #include <stdint.h>
+
+#include <zephyr/drivers/uart.h>
+#include <zephyr/kernel.h>
+#include <zephyr/sys/printk.h>
+#include <zephyr/usb/usb_device.h>
+#include <zephyr/usb/usbd.h>
+
+// BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console),
+// zephyr_cdc_acm_uart),
+//              "Console device is not ACM CDC UART device");
 
 #define LED0_NODE DT_ALIAS(led0)
 
@@ -48,12 +59,17 @@ int main() {
   const struct device *const i2c_dev = DEVICE_DT_GET(DT_ALIAS(i2c0));
   const struct device *const icm20948_dev = DEVICE_DT_GET(DT_ALIAS(compass));
 
+  struct compass_calibration_data compass_calibration_data;
+
   printk("\n");
 
   if (!device_is_ready(i2c_dev)) {
     printk("Could not get i2c device\n");
     return -1;
   }
+
+  scan_i2c(i2c_dev, led);
+  k_msleep(1000);
 
   if (!device_is_ready(icm20948_dev)) {
     printk("Could not get icm20948 sensor");
@@ -62,9 +78,6 @@ int main() {
 
   printk("Using board %s\n", CONFIG_BOARD);
   printk("\n");
-
-  k_msleep(1000);
-  scan_i2c(i2c_dev, led);
 
   //  struct RtcDs1307 *rtc = ds1307_create(i2c_dev, 0x68);
 
@@ -105,6 +118,11 @@ int main() {
     }
     printk(" )");
     printk("\n");
+
+    double angle =
+        compass_gauss_to_heading2d(&compass_calibration_data, mag_xyz);
+
+    // printk("Angle is: %6lf\n", angle);
 
     k_sleep(K_MSEC(1000));
     gpio_pin_toggle_dt(&led);

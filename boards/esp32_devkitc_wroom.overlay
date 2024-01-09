@@ -28,15 +28,15 @@
         status = "okay";
    }; 
    
-   compass: icm20948@68 {
+   compass: icm20948@69 {
         compatible = "invensense,icm20948";
         friendly-name = "compass";
-        reg = <0x68>;
+        reg = <0x69>;
         status = "okay";
         mag-freq = <100>;
         accel-fchoice = <1>;
-        accel-hz = "0.27";
-        gyro-hz = "4.4";
+        accel-hz = "102.3";
+        gyro-hz = "102.3";
    };
 };
 
